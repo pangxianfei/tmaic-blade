@@ -1,0 +1,73 @@
+{
+    "name": "tmaic/blade",
+    "description": "Use Laravel Blade templates without the full Laravel framework",
+    "keywords": [
+        "thinkphp8",
+        "blade"
+    ],
+    "type": "library",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "pangxianfei",
+            "email": "421339244@qq.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": "^8.1",
+        "ext-fileinfo": "*",
+        "ext-json": "*",
+        "ext-mbstring": "*",
+        "psr/container": "^2.0.1",
+        "psr/simple-cache": "^3.0",
+        "symfony/finder": "^6.0",
+        "topthink/framework": "^8.0",
+        "topthink/think-helper": "^3.1.6"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9",
+        "topthink/think-template": "^2.0",
+        "bamarni/composer-bin-plugin": "^1.8",
+        "php-cs-fixer/shim": "^3.22",
+        "symfony/mime": "^6.0",
+        "phpstan/phpstan": "^1.10",
+        "rector/rector": "^0.17.12"
+    },
+    "replace": {
+        "illuminate/contracts": "~9.52.15",
+        "illuminate/container": "~9.52.15",
+        "illuminate/collections": "~9.52.15",
+        "illuminate/support": "~9.52.15",
+        "illuminate/view": "~9.52.15"
+    },
+    "suggest": {
+        "ramsey/uuid": "Required to use Str::uuid() (^3.7).",
+        "doctrine/inflector": "Required to use the pluralizer (^2.0).",
+        "voku/portable-ascii": "Required to enable support for string ascii extensions (^2.0).",
+        "nesbot/carbon": "nesbot/carbon=^2.62.1",
+        "symfony/mime": "Required to enable support for guessing extensions (^6.0).",
+        "symfony/var-dumper": "Required to use the dd function (^6.0)."
+    },
+    "autoload": {
+        "psr-4": {
+            "think\\view\\driver\\": "driver",
+            "Tmaic\\Think\\Blade\\": "src-next",
+            "Illuminate\\Filesystem\\": "lib/filesystem"
+        },
+        "files": [
+            "third-party/vendor/scoper-autoload.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tmaic\\BladeTest\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": false,
+        "allow-plugins": {
+            "bamarni/composer-bin-plugin": true
+        }
+    }
+}
