@@ -35,11 +35,11 @@
         "rector/rector": "^0.17.12"
     },
     "replace": {
-        "illuminate/contracts": "~9.52.15",
-        "illuminate/container": "~9.52.15",
-        "illuminate/collections": "~9.52.15",
-        "illuminate/support": "~9.52.15",
-        "illuminate/view": "~9.52.15"
+        "illuminate/contracts": "^10.24",
+        "illuminate/container": "^10.24",
+        "illuminate/collections": "^10.24",
+        "illuminate/support": "^10.24",
+        "illuminate/view": "v10.24.0"
     },
     "suggest": {
         "ramsey/uuid": "Required to use Str::uuid() (^3.7).",
