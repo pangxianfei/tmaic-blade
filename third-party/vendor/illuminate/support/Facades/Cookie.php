@@ -21,7 +21,7 @@ namespace Illuminate\Support\Facades;
  *
  * @see \Illuminate\Cookie\CookieJar
  */
-class Cookie extends \Illuminate\Support\Facades\Facade
+class Cookie extends Facade
 {
     /**
      * Determine if a cookie exists on the request.

@@ -13,8 +13,7 @@ class ConfigurationUrlParser
      */
     protected static $driverAliases = [
         'mssql' => 'sqlsrv',
-        'mysql2' => 'mysql',
-        // RDS
+        'mysql2' => 'mysql', // RDS
         'postgres' => 'pgsql',
         'postgresql' => 'pgsql',
         'sqlite3' => 'sqlite',
@@ -33,15 +32,24 @@ class ConfigurationUrlParser
         if (is_string($config)) {
             $config = ['url' => $config];
         }
-        $url = \Illuminate\Support\Arr::pull($config, 'url');
+
+        $url = Arr::pull($config, 'url');
 
         if (! $url) {
             return $config;
         }
-        $rawComponents = $this->parseUrl($url);
-        $decodedComponents = $this->parseStringsToNativeTypes(array_map('rawurldecode', $rawComponents));
 
-        return array_merge($config, $this->getPrimaryOptions($decodedComponents), $this->getQueryOptions($rawComponents));
+        $rawComponents = $this->parseUrl($url);
+
+        $decodedComponents = $this->parseStringsToNativeTypes(
+            array_map('rawurldecode', $rawComponents)
+        );
+
+        return array_merge(
+            $config,
+            $this->getPrimaryOptions($decodedComponents),
+            $this->getQueryOptions($rawComponents)
+        );
     }
 
     /**
@@ -52,7 +60,14 @@ class ConfigurationUrlParser
      */
     protected function getPrimaryOptions($url)
     {
-        return array_filter(['driver' => $this->getDriver($url), 'database' => $this->getDatabase($url), 'host' => $url['host'] ?? null, 'port' => $url['port'] ?? null, 'username' => $url['user'] ?? null, 'password' => $url['pass'] ?? null], fn ($value) => ! is_null($value));
+        return array_filter([
+            'driver' => $this->getDriver($url),
+            'database' => $this->getDatabase($url),
+            'host' => $url['host'] ?? null,
+            'port' => $url['port'] ?? null,
+            'username' => $url['user'] ?? null,
+            'password' => $url['pass'] ?? null,
+        ], fn ($value) => ! is_null($value));
     }
 
     /**
@@ -98,7 +113,9 @@ class ConfigurationUrlParser
         if (! $queryString) {
             return [];
         }
+
         $query = [];
+
         parse_str($queryString, $query);
 
         return $this->parseStringsToNativeTypes($query);
@@ -110,11 +127,12 @@ class ConfigurationUrlParser
      * @param  string  $url
      * @return array
      *
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     protected function parseUrl($url)
     {
         $url = preg_replace('#^(sqlite3?):///#', '$1://null/', $url);
+
         $parsedUrl = parse_url($url);
 
         if ($parsedUrl === false) {
@@ -139,9 +157,10 @@ class ConfigurationUrlParser
         if (! is_string($value)) {
             return $value;
         }
+
         $parsedValue = json_decode($value, true);
 
-        if (json_last_error() === \JSON_ERROR_NONE) {
+        if (json_last_error() === JSON_ERROR_NONE) {
             return $parsedValue;
         }
 

@@ -2,9 +2,10 @@
 
 namespace Illuminate\Support;
 
-use __Illuminate\Dotenv\Repository\Adapter\PutenvAdapter;
-use __Illuminate\Dotenv\Repository\RepositoryBuilder;
-use __Illuminate\PhpOption\Option;
+use Dotenv\Repository\Adapter\PutenvAdapter;
+use Dotenv\Repository\RepositoryBuilder;
+use PhpOption\Option;
+use RuntimeException;
 
 class Env
 {
@@ -57,6 +58,7 @@ class Env
             if (static::$putenv) {
                 $builder = $builder->addAdapter(PutenvAdapter::class);
             }
+
             static::$repository = $builder->immutable()->make();
         }
 
@@ -64,7 +66,7 @@ class Env
     }
 
     /**
-     * Gets the value of an environment variable.
+     * Get the value of an environment variable.
      *
      * @param  string  $key
      * @param  mixed  $default
@@ -72,30 +74,52 @@ class Env
      */
     public static function get($key, $default = null)
     {
-        return Option::fromValue(static::getRepository()->get($key))->map(function ($value) {
-            switch (strtolower($value)) {
-                case 'true':
-                case '(true)':
-                    return true;
+        return self::getOption($key)->getOrCall(fn () => value($default));
+    }
 
-                case 'false':
-                case '(false)':
-                    return false;
+    /**
+     * Get the value of a required environment variable.
+     *
+     * @param  string  $key
+     * @return mixed
+     *
+     * @throws \RuntimeException
+     */
+    public static function getOrFail($key)
+    {
+        return self::getOption($key)->getOrThrow(new RuntimeException("Environment variable [$key] has no value."));
+    }
 
-                case 'empty':
-                case '(empty)':
-                    return '';
+    /**
+     * Get the possible option for this environment variable.
+     *
+     * @param  string  $key
+     * @return \PhpOption\Option|\PhpOption\Some
+     */
+    protected static function getOption($key)
+    {
+        return Option::fromValue(static::getRepository()->get($key))
+            ->map(function ($value) {
+                switch (strtolower($value)) {
+                    case 'true':
+                    case '(true)':
+                        return true;
+                    case 'false':
+                    case '(false)':
+                        return false;
+                    case 'empty':
+                    case '(empty)':
+                        return '';
+                    case 'null':
+                    case '(null)':
+                        return;
+                }
 
-                case 'null':
-                case '(null)':
-                    return;
-            }
+                if (preg_match('/\A([\'"])(.*)\1\z/', $value, $matches)) {
+                    return $matches[2];
+                }
 
-            if (preg_match('/\\A([\'"])(.*)\\1\\z/', $value, $matches)) {
-                return $matches[2];
-            }
-
-            return $value;
-        })->getOrCall(fn () => \__Illuminate\value($default));
+                return $value;
+            });
     }
 }

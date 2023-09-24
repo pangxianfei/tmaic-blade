@@ -2,8 +2,8 @@
 
 namespace Illuminate\Support;
 
+use ArrayAccess;
 use Closure;
-use Countable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
@@ -11,7 +11,7 @@ use Illuminate\Support\Traits\Tappable;
 use JsonSerializable;
 use Symfony\Component\VarDumper\VarDumper;
 
-class Stringable implements JsonSerializable
+class Stringable implements JsonSerializable, ArrayAccess
 {
     use Conditionable, Macroable, Tappable;
 
@@ -41,7 +41,7 @@ class Stringable implements JsonSerializable
      */
     public function after($search)
     {
-        return new static(\Illuminate\Support\Str::after($this->value, $search));
+        return new static(Str::after($this->value, $search));
     }
 
     /**
@@ -52,13 +52,13 @@ class Stringable implements JsonSerializable
      */
     public function afterLast($search)
     {
-        return new static(\Illuminate\Support\Str::afterLast($this->value, $search));
+        return new static(Str::afterLast($this->value, $search));
     }
 
     /**
      * Append the given values to the string.
      *
-     * @param  string  ...$values
+     * @param  array|string  ...$values
      * @return static
      */
     public function append(...$values)
@@ -74,7 +74,7 @@ class Stringable implements JsonSerializable
      */
     public function newLine($count = 1)
     {
-        return $this->append(str_repeat(\PHP_EOL, $count));
+        return $this->append(str_repeat(PHP_EOL, $count));
     }
 
     /**
@@ -85,7 +85,7 @@ class Stringable implements JsonSerializable
      */
     public function ascii($language = 'en')
     {
-        return new static(\Illuminate\Support\Str::ascii($this->value, $language));
+        return new static(Str::ascii($this->value, $language));
     }
 
     /**
@@ -100,13 +100,24 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Get the character at the specified index.
+     *
+     * @param  int  $index
+     * @return string|false
+     */
+    public function charAt($index)
+    {
+        return Str::charAt($this->value, $index);
+    }
+
+    /**
      * Get the basename of the class path.
      *
      * @return static
      */
     public function classBasename()
     {
-        return new static(\__Illuminate\class_basename($this->value));
+        return new static(class_basename($this->value));
     }
 
     /**
@@ -117,7 +128,7 @@ class Stringable implements JsonSerializable
      */
     public function before($search)
     {
-        return new static(\Illuminate\Support\Str::before($this->value, $search));
+        return new static(Str::before($this->value, $search));
     }
 
     /**
@@ -128,7 +139,7 @@ class Stringable implements JsonSerializable
      */
     public function beforeLast($search)
     {
-        return new static(\Illuminate\Support\Str::beforeLast($this->value, $search));
+        return new static(Str::beforeLast($this->value, $search));
     }
 
     /**
@@ -140,7 +151,7 @@ class Stringable implements JsonSerializable
      */
     public function between($from, $to)
     {
-        return new static(\Illuminate\Support\Str::between($this->value, $from, $to));
+        return new static(Str::between($this->value, $from, $to));
     }
 
     /**
@@ -152,7 +163,7 @@ class Stringable implements JsonSerializable
      */
     public function betweenFirst($from, $to)
     {
-        return new static(\Illuminate\Support\Str::betweenFirst($this->value, $from, $to));
+        return new static(Str::betweenFirst($this->value, $from, $to));
     }
 
     /**
@@ -162,7 +173,7 @@ class Stringable implements JsonSerializable
      */
     public function camel()
     {
-        return new static(\Illuminate\Support\Str::camel($this->value));
+        return new static(Str::camel($this->value));
     }
 
     /**
@@ -174,7 +185,7 @@ class Stringable implements JsonSerializable
      */
     public function contains($needles, $ignoreCase = false)
     {
-        return \Illuminate\Support\Str::contains($this->value, $needles, $ignoreCase);
+        return Str::contains($this->value, $needles, $ignoreCase);
     }
 
     /**
@@ -186,7 +197,7 @@ class Stringable implements JsonSerializable
      */
     public function containsAll($needles, $ignoreCase = false)
     {
-        return \Illuminate\Support\Str::containsAll($this->value, $needles, $ignoreCase);
+        return Str::containsAll($this->value, $needles, $ignoreCase);
     }
 
     /**
@@ -208,7 +219,7 @@ class Stringable implements JsonSerializable
      */
     public function endsWith($needles)
     {
-        return \Illuminate\Support\Str::endsWith($this->value, $needles);
+        return Str::endsWith($this->value, $needles);
     }
 
     /**
@@ -219,7 +230,7 @@ class Stringable implements JsonSerializable
      */
     public function exactly($value)
     {
-        if ($value instanceof \Illuminate\Support\Stringable) {
+        if ($value instanceof Stringable) {
             $value = $value->toString();
         }
 
@@ -235,7 +246,7 @@ class Stringable implements JsonSerializable
      */
     public function excerpt($phrase = '', $options = [])
     {
-        return \Illuminate\Support\Str::excerpt($this->value, $phrase, $options);
+        return Str::excerpt($this->value, $phrase, $options);
     }
 
     /**
@@ -243,11 +254,11 @@ class Stringable implements JsonSerializable
      *
      * @param  string  $delimiter
      * @param  int  $limit
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection<int, string>
      */
-    public function explode($delimiter, $limit = \PHP_INT_MAX)
+    public function explode($delimiter, $limit = PHP_INT_MAX)
     {
-        return \__Illuminate\collect(explode($delimiter, $this->value, $limit));
+        return collect(explode($delimiter, $this->value, $limit));
     }
 
     /**
@@ -256,16 +267,17 @@ class Stringable implements JsonSerializable
      * @param  string|int  $pattern
      * @param  int  $limit
      * @param  int  $flags
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection<int, string>
      */
     public function split($pattern, $limit = -1, $flags = 0)
     {
-        if (filter_var($pattern, \FILTER_VALIDATE_INT) !== false) {
-            return \__Illuminate\collect(mb_str_split($this->value, $pattern));
+        if (filter_var($pattern, FILTER_VALIDATE_INT) !== false) {
+            return collect(mb_str_split($this->value, $pattern));
         }
+
         $segments = preg_split($pattern, $this->value, $limit, $flags);
 
-        return ! empty($segments) ? \__Illuminate\collect($segments) : \__Illuminate\collect();
+        return ! empty($segments) ? collect($segments) : collect();
     }
 
     /**
@@ -276,7 +288,7 @@ class Stringable implements JsonSerializable
      */
     public function finish($cap)
     {
-        return new static(\Illuminate\Support\Str::finish($this->value, $cap));
+        return new static(Str::finish($this->value, $cap));
     }
 
     /**
@@ -287,7 +299,7 @@ class Stringable implements JsonSerializable
      */
     public function is($pattern)
     {
-        return \Illuminate\Support\Str::is($pattern, $this->value);
+        return Str::is($pattern, $this->value);
     }
 
     /**
@@ -297,7 +309,7 @@ class Stringable implements JsonSerializable
      */
     public function isAscii()
     {
-        return \Illuminate\Support\Str::isAscii($this->value);
+        return Str::isAscii($this->value);
     }
 
     /**
@@ -307,7 +319,17 @@ class Stringable implements JsonSerializable
      */
     public function isJson()
     {
-        return \Illuminate\Support\Str::isJson($this->value);
+        return Str::isJson($this->value);
+    }
+
+    /**
+     * Determine if a given value is a valid URL.
+     *
+     * @return bool
+     */
+    public function isUrl()
+    {
+        return Str::isUrl($this->value);
     }
 
     /**
@@ -317,7 +339,7 @@ class Stringable implements JsonSerializable
      */
     public function isUuid()
     {
-        return \Illuminate\Support\Str::isUuid($this->value);
+        return Str::isUuid($this->value);
     }
 
     /**
@@ -327,7 +349,7 @@ class Stringable implements JsonSerializable
      */
     public function isUlid()
     {
-        return \Illuminate\Support\Str::isUlid($this->value);
+        return Str::isUlid($this->value);
     }
 
     /**
@@ -357,7 +379,7 @@ class Stringable implements JsonSerializable
      */
     public function kebab()
     {
-        return new static(\Illuminate\Support\Str::kebab($this->value));
+        return new static(Str::kebab($this->value));
     }
 
     /**
@@ -368,7 +390,7 @@ class Stringable implements JsonSerializable
      */
     public function length($encoding = null)
     {
-        return \Illuminate\Support\Str::length($this->value, $encoding);
+        return Str::length($this->value, $encoding);
     }
 
     /**
@@ -380,7 +402,7 @@ class Stringable implements JsonSerializable
      */
     public function limit($limit = 100, $end = '...')
     {
-        return new static(\Illuminate\Support\Str::limit($this->value, $limit, $end));
+        return new static(Str::limit($this->value, $limit, $end));
     }
 
     /**
@@ -390,27 +412,29 @@ class Stringable implements JsonSerializable
      */
     public function lower()
     {
-        return new static(\Illuminate\Support\Str::lower($this->value));
+        return new static(Str::lower($this->value));
     }
 
     /**
      * Convert GitHub flavored Markdown into HTML.
      *
+     * @param  array  $options
      * @return static
      */
     public function markdown(array $options = [])
     {
-        return new static(\Illuminate\Support\Str::markdown($this->value, $options));
+        return new static(Str::markdown($this->value, $options));
     }
 
     /**
      * Convert inline Markdown into HTML.
      *
+     * @param  array  $options
      * @return static
      */
     public function inlineMarkdown(array $options = [])
     {
-        return new static(\Illuminate\Support\Str::inlineMarkdown($this->value, $options));
+        return new static(Str::inlineMarkdown($this->value, $options));
     }
 
     /**
@@ -424,7 +448,7 @@ class Stringable implements JsonSerializable
      */
     public function mask($character, $index, $length = null, $encoding = 'UTF-8')
     {
-        return new static(\Illuminate\Support\Str::mask($this->value, $character, $index, $length, $encoding));
+        return new static(Str::mask($this->value, $character, $index, $length, $encoding));
     }
 
     /**
@@ -435,7 +459,18 @@ class Stringable implements JsonSerializable
      */
     public function match($pattern)
     {
-        return new static(\Illuminate\Support\Str::match($pattern, $this->value));
+        return new static(Str::match($pattern, $this->value));
+    }
+
+    /**
+     * Determine if a given string matches a given pattern.
+     *
+     * @param  string|iterable<string>  $pattern
+     * @return bool
+     */
+    public function isMatch($pattern)
+    {
+        return Str::isMatch($pattern, $this->value);
     }
 
     /**
@@ -446,7 +481,7 @@ class Stringable implements JsonSerializable
      */
     public function matchAll($pattern)
     {
-        return \Illuminate\Support\Str::matchAll($pattern, $this->value);
+        return Str::matchAll($pattern, $this->value);
     }
 
     /**
@@ -457,7 +492,7 @@ class Stringable implements JsonSerializable
      */
     public function test($pattern)
     {
-        return $this->match($pattern)->isNotEmpty();
+        return $this->isMatch($pattern);
     }
 
     /**
@@ -469,7 +504,7 @@ class Stringable implements JsonSerializable
      */
     public function padBoth($length, $pad = ' ')
     {
-        return new static(\Illuminate\Support\Str::padBoth($this->value, $length, $pad));
+        return new static(Str::padBoth($this->value, $length, $pad));
     }
 
     /**
@@ -481,7 +516,7 @@ class Stringable implements JsonSerializable
      */
     public function padLeft($length, $pad = ' ')
     {
-        return new static(\Illuminate\Support\Str::padLeft($this->value, $length, $pad));
+        return new static(Str::padLeft($this->value, $length, $pad));
     }
 
     /**
@@ -493,7 +528,7 @@ class Stringable implements JsonSerializable
      */
     public function padRight($length, $pad = ' ')
     {
-        return new static(\Illuminate\Support\Str::padRight($this->value, $length, $pad));
+        return new static(Str::padRight($this->value, $length, $pad));
     }
 
     /**
@@ -504,12 +539,13 @@ class Stringable implements JsonSerializable
      */
     public function parseCallback($default = null)
     {
-        return \Illuminate\Support\Str::parseCallback($this->value, $default);
+        return Str::parseCallback($this->value, $default);
     }
 
     /**
      * Call the given callback and return a new string.
      *
+     * @param  callable  $callback
      * @return static
      */
     public function pipe(callable $callback)
@@ -520,23 +556,36 @@ class Stringable implements JsonSerializable
     /**
      * Get the plural form of an English word.
      *
-     * @param  int|array|Countable  $count
+     * @param  int|array|\Countable  $count
      * @return static
      */
     public function plural($count = 2)
     {
-        return new static(\Illuminate\Support\Str::plural($this->value, $count));
+        return new static(Str::plural($this->value, $count));
     }
 
     /**
      * Pluralize the last word of an English, studly caps case string.
      *
-     * @param  int|array|Countable  $count
+     * @param  int|array|\Countable  $count
      * @return static
      */
     public function pluralStudly($count = 2)
     {
-        return new static(\Illuminate\Support\Str::pluralStudly($this->value, $count));
+        return new static(Str::pluralStudly($this->value, $count));
+    }
+
+    /**
+     * Find the multi-byte safe position of the first occurrence of the given substring.
+     *
+     * @param  string  $needle
+     * @param  int  $offset
+     * @param  string|null  $encoding
+     * @return int|false
+     */
+    public function position($needle, $offset = 0, $encoding = null)
+    {
+        return Str::position($this->value, $needle, $offset, $encoding);
     }
 
     /**
@@ -559,7 +608,7 @@ class Stringable implements JsonSerializable
      */
     public function remove($search, $caseSensitive = true)
     {
-        return new static(\Illuminate\Support\Str::remove($search, $this->value, $caseSensitive));
+        return new static(Str::remove($search, $this->value, $caseSensitive));
     }
 
     /**
@@ -569,12 +618,13 @@ class Stringable implements JsonSerializable
      */
     public function reverse()
     {
-        return new static(\Illuminate\Support\Str::reverse($this->value));
+        return new static(Str::reverse($this->value));
     }
 
     /**
      * Repeat the string.
      *
+     * @param  int  $times
      * @return static
      */
     public function repeat(int $times)
@@ -587,11 +637,12 @@ class Stringable implements JsonSerializable
      *
      * @param  string|iterable<string>  $search
      * @param  string|iterable<string>  $replace
+     * @param  bool  $caseSensitive
      * @return static
      */
-    public function replace($search, $replace)
+    public function replace($search, $replace, $caseSensitive = true)
     {
-        return new static(\Illuminate\Support\Str::replace($search, $replace, $this->value));
+        return new static(Str::replace($search, $replace, $this->value, $caseSensitive));
     }
 
     /**
@@ -603,7 +654,7 @@ class Stringable implements JsonSerializable
      */
     public function replaceArray($search, $replace)
     {
-        return new static(\Illuminate\Support\Str::replaceArray($search, $replace, $this->value));
+        return new static(Str::replaceArray($search, $replace, $this->value));
     }
 
     /**
@@ -615,7 +666,19 @@ class Stringable implements JsonSerializable
      */
     public function replaceFirst($search, $replace)
     {
-        return new static(\Illuminate\Support\Str::replaceFirst($search, $replace, $this->value));
+        return new static(Str::replaceFirst($search, $replace, $this->value));
+    }
+
+    /**
+     * Replace the first occurrence of the given value if it appears at the start of the string.
+     *
+     * @param  string  $search
+     * @param  string  $replace
+     * @return static
+     */
+    public function replaceStart($search, $replace)
+    {
+        return new static(Str::replaceStart($search, $replace, $this->value));
     }
 
     /**
@@ -627,14 +690,26 @@ class Stringable implements JsonSerializable
      */
     public function replaceLast($search, $replace)
     {
-        return new static(\Illuminate\Support\Str::replaceLast($search, $replace, $this->value));
+        return new static(Str::replaceLast($search, $replace, $this->value));
+    }
+
+    /**
+     * Replace the last occurrence of a given value if it appears at the end of the string.
+     *
+     * @param  string  $search
+     * @param  string  $replace
+     * @return static
+     */
+    public function replaceEnd($search, $replace)
+    {
+        return new static(Str::replaceEnd($search, $replace, $this->value));
     }
 
     /**
      * Replace the patterns matching the given regular expression.
      *
      * @param  string  $pattern
-     * @param  Closure|string  $replace
+     * @param  \Closure|string  $replace
      * @param  int  $limit
      * @return static
      */
@@ -655,7 +730,7 @@ class Stringable implements JsonSerializable
      */
     public function scan($format)
     {
-        return \__Illuminate\collect(sscanf($this->value, $format));
+        return collect(sscanf($this->value, $format));
     }
 
     /**
@@ -665,7 +740,7 @@ class Stringable implements JsonSerializable
      */
     public function squish()
     {
-        return new static(\Illuminate\Support\Str::squish($this->value));
+        return new static(Str::squish($this->value));
     }
 
     /**
@@ -676,7 +751,7 @@ class Stringable implements JsonSerializable
      */
     public function start($prefix)
     {
-        return new static(\Illuminate\Support\Str::start($this->value, $prefix));
+        return new static(Str::start($this->value, $prefix));
     }
 
     /**
@@ -697,7 +772,7 @@ class Stringable implements JsonSerializable
      */
     public function upper()
     {
-        return new static(\Illuminate\Support\Str::upper($this->value));
+        return new static(Str::upper($this->value));
     }
 
     /**
@@ -707,7 +782,7 @@ class Stringable implements JsonSerializable
      */
     public function title()
     {
-        return new static(\Illuminate\Support\Str::title($this->value));
+        return new static(Str::title($this->value));
     }
 
     /**
@@ -717,7 +792,7 @@ class Stringable implements JsonSerializable
      */
     public function headline()
     {
-        return new static(\Illuminate\Support\Str::headline($this->value));
+        return new static(Str::headline($this->value));
     }
 
     /**
@@ -727,7 +802,7 @@ class Stringable implements JsonSerializable
      */
     public function singular()
     {
-        return new static(\Illuminate\Support\Str::singular($this->value));
+        return new static(Str::singular($this->value));
     }
 
     /**
@@ -740,7 +815,7 @@ class Stringable implements JsonSerializable
      */
     public function slug($separator = '-', $language = 'en', $dictionary = ['@' => 'at'])
     {
-        return new static(\Illuminate\Support\Str::slug($this->value, $separator, $language, $dictionary));
+        return new static(Str::slug($this->value, $separator, $language, $dictionary));
     }
 
     /**
@@ -751,7 +826,7 @@ class Stringable implements JsonSerializable
      */
     public function snake($delimiter = '_')
     {
-        return new static(\Illuminate\Support\Str::snake($this->value, $delimiter));
+        return new static(Str::snake($this->value, $delimiter));
     }
 
     /**
@@ -762,7 +837,7 @@ class Stringable implements JsonSerializable
      */
     public function startsWith($needles)
     {
-        return \Illuminate\Support\Str::startsWith($this->value, $needles);
+        return Str::startsWith($this->value, $needles);
     }
 
     /**
@@ -772,7 +847,7 @@ class Stringable implements JsonSerializable
      */
     public function studly()
     {
-        return new static(\Illuminate\Support\Str::studly($this->value));
+        return new static(Str::studly($this->value));
     }
 
     /**
@@ -785,7 +860,7 @@ class Stringable implements JsonSerializable
      */
     public function substr($start, $length = null, $encoding = 'UTF-8')
     {
-        return new static(\Illuminate\Support\Str::substr($this->value, $start, $length, $encoding));
+        return new static(Str::substr($this->value, $start, $length, $encoding));
     }
 
     /**
@@ -798,7 +873,7 @@ class Stringable implements JsonSerializable
      */
     public function substrCount($needle, $offset = 0, $length = null)
     {
-        return \Illuminate\Support\Str::substrCount($this->value, $needle, $offset, $length);
+        return Str::substrCount($this->value, $needle, $offset, $length);
     }
 
     /**
@@ -811,12 +886,13 @@ class Stringable implements JsonSerializable
      */
     public function substrReplace($replace, $offset = 0, $length = null)
     {
-        return new static(\Illuminate\Support\Str::substrReplace($this->value, $replace, $offset, $length));
+        return new static(Str::substrReplace($this->value, $replace, $offset, $length));
     }
 
     /**
      * Swap multiple keywords in a string with other keywords.
      *
+     * @param  array  $map
      * @return static
      */
     public function swap(array $map)
@@ -864,7 +940,7 @@ class Stringable implements JsonSerializable
      */
     public function lcfirst()
     {
-        return new static(\Illuminate\Support\Str::lcfirst($this->value));
+        return new static(Str::lcfirst($this->value));
     }
 
     /**
@@ -874,17 +950,17 @@ class Stringable implements JsonSerializable
      */
     public function ucfirst()
     {
-        return new static(\Illuminate\Support\Str::ucfirst($this->value));
+        return new static(Str::ucfirst($this->value));
     }
 
     /**
      * Split a string by uppercase characters.
      *
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection<int, string>
      */
     public function ucsplit()
     {
-        return \__Illuminate\collect(\Illuminate\Support\Str::ucsplit($this->value));
+        return collect(Str::ucsplit($this->value));
     }
 
     /**
@@ -1060,7 +1136,7 @@ class Stringable implements JsonSerializable
      */
     public function words($words = 100, $end = '...')
     {
-        return new static(\Illuminate\Support\Str::words($this->value, $words, $end));
+        return new static(Str::words($this->value, $words, $end));
     }
 
     /**
@@ -1071,7 +1147,20 @@ class Stringable implements JsonSerializable
      */
     public function wordCount($characters = null)
     {
-        return \Illuminate\Support\Str::wordCount($this->value, $characters);
+        return Str::wordCount($this->value, $characters);
+    }
+
+    /**
+     * Wrap a string to a given number of characters.
+     *
+     * @param  int  $characters
+     * @param  string  $break
+     * @param  bool  $cutLongWords
+     * @return static
+     */
+    public function wordWrap($characters = 75, $break = "\n", $cutLongWords = false)
+    {
+        return new static(Str::wordWrap($this->value, $characters, $break, $cutLongWords));
     }
 
     /**
@@ -1083,7 +1172,7 @@ class Stringable implements JsonSerializable
      */
     public function wrap($before, $after = null)
     {
-        return new static(\Illuminate\Support\Str::wrap($this->value, $before, $after));
+        return new static(Str::wrap($this->value, $before, $after));
     }
 
     /**
@@ -1093,7 +1182,7 @@ class Stringable implements JsonSerializable
      */
     public function toHtmlString()
     {
-        return new \Illuminate\Support\HtmlString($this->value);
+        return new HtmlString($this->value);
     }
 
     /**
@@ -1169,7 +1258,7 @@ class Stringable implements JsonSerializable
      */
     public function toBoolean()
     {
-        return filter_var($this->value, \FILTER_VALIDATE_BOOLEAN);
+        return filter_var($this->value, FILTER_VALIDATE_BOOLEAN);
     }
 
     /**
@@ -1192,10 +1281,56 @@ class Stringable implements JsonSerializable
 
     /**
      * Convert the object to a string when JSON encoded.
+     *
+     * @return string
      */
     public function jsonSerialize(): string
     {
         return $this->__toString();
+    }
+
+    /**
+     * Determine if the given offset exists.
+     *
+     * @param  mixed  $offset
+     * @return bool
+     */
+    public function offsetExists(mixed $offset): bool
+    {
+        return isset($this->value[$offset]);
+    }
+
+    /**
+     * Get the value at the given offset.
+     *
+     * @param  mixed  $offset
+     * @return string
+     */
+    public function offsetGet(mixed $offset): string
+    {
+        return $this->value[$offset];
+    }
+
+    /**
+     * Set the value at the given offset.
+     *
+     * @param  mixed  $offset
+     * @return void
+     */
+    public function offsetSet(mixed $offset, mixed $value): void
+    {
+        $this->value[$offset] = $value;
+    }
+
+    /**
+     * Unset the value at the given offset.
+     *
+     * @param  mixed  $offset
+     * @return void
+     */
+    public function offsetUnset(mixed $offset): void
+    {
+        unset($this->value[$offset]);
     }
 
     /**

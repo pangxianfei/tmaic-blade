@@ -12,7 +12,7 @@ use Illuminate\Support\Testing\Fakes\EventFake;
  * @method static void push(string $event, object|array $payload = [])
  * @method static void flush(string $event)
  * @method static void subscribe(object|string $subscriber)
- * @method static array|null until(string|object $event, mixed $payload = [])
+ * @method static mixed until(string|object $event, mixed $payload = [])
  * @method static array|null dispatch(string|object $event, mixed $payload = [], bool $halt = false)
  * @method static array getListeners(string $eventName)
  * @method static \Closure makeListener(\Closure|string|array $listener, bool $wildcard = false)
@@ -37,7 +37,7 @@ use Illuminate\Support\Testing\Fakes\EventFake;
  * @see \Illuminate\Events\Dispatcher
  * @see \Illuminate\Support\Testing\Fakes\EventFake
  */
-class Event extends \Illuminate\Support\Facades\Facade
+class Event extends Facade
 {
     /**
      * Replace the bound instance with a fake.
@@ -47,11 +47,16 @@ class Event extends \Illuminate\Support\Facades\Facade
      */
     public static function fake($eventsToFake = [])
     {
-        static::swap($fake = new EventFake(static::getFacadeRoot(), $eventsToFake));
-        Model::setEventDispatcher($fake);
-        \Illuminate\Support\Facades\Cache::refreshEventDispatcher();
+        $actualDispatcher = static::isFake()
+                ? static::getFacadeRoot()->dispatcher
+                : static::getFacadeRoot();
 
-        return $fake;
+        return tap(new EventFake($actualDispatcher, $eventsToFake), function ($fake) {
+            static::swap($fake);
+
+            Model::setEventDispatcher($fake);
+            Cache::refreshEventDispatcher();
+        });
     }
 
     /**
@@ -62,42 +67,52 @@ class Event extends \Illuminate\Support\Facades\Facade
      */
     public static function fakeExcept($eventsToAllow)
     {
-        return static::fake([function ($eventName) use ($eventsToAllow) {
-            return ! in_array($eventName, (array) $eventsToAllow);
-        }]);
+        return static::fake([
+            function ($eventName) use ($eventsToAllow) {
+                return ! in_array($eventName, (array) $eventsToAllow);
+            },
+        ]);
     }
 
     /**
      * Replace the bound instance with a fake during the given callable's execution.
      *
+     * @param  callable  $callable
+     * @param  array  $eventsToFake
      * @return mixed
      */
     public static function fakeFor(callable $callable, array $eventsToFake = [])
     {
         $originalDispatcher = static::getFacadeRoot();
+
         static::fake($eventsToFake);
 
-        return \__Illuminate\tap($callable(), function () use ($originalDispatcher) {
+        return tap($callable(), function () use ($originalDispatcher) {
             static::swap($originalDispatcher);
+
             Model::setEventDispatcher($originalDispatcher);
-            \Illuminate\Support\Facades\Cache::refreshEventDispatcher();
+            Cache::refreshEventDispatcher();
         });
     }
 
     /**
      * Replace the bound instance with a fake during the given callable's execution.
      *
+     * @param  callable  $callable
+     * @param  array  $eventsToAllow
      * @return mixed
      */
     public static function fakeExceptFor(callable $callable, array $eventsToAllow = [])
     {
         $originalDispatcher = static::getFacadeRoot();
+
         static::fakeExcept($eventsToAllow);
 
-        return \__Illuminate\tap($callable(), function () use ($originalDispatcher) {
+        return tap($callable(), function () use ($originalDispatcher) {
             static::swap($originalDispatcher);
+
             Model::setEventDispatcher($originalDispatcher);
-            \Illuminate\Support\Facades\Cache::refreshEventDispatcher();
+            Cache::refreshEventDispatcher();
         });
     }
 

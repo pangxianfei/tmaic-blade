@@ -2,13 +2,14 @@
 
 namespace Illuminate\Support\Facades;
 
-use __Illuminate\Mockery;
-use __Illuminate\Mockery\LegacyMockInterface;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Js;
 use Illuminate\Support\Str;
+use Illuminate\Support\Testing\Fakes\Fake;
+use Mockery;
+use Mockery\LegacyMockInterface;
 use RuntimeException;
 
 abstract class Facade
@@ -37,6 +38,7 @@ abstract class Facade
     /**
      * Run a Closure when the facade has been resolved.
      *
+     * @param  \Closure  $callback
      * @return void
      */
     public static function resolved(Closure $callback)
@@ -46,6 +48,7 @@ abstract class Facade
         if (static::$app->resolved($accessor) === true) {
             $callback(static::getFacadeRoot());
         }
+
         static::$app->afterResolving($accessor, function ($service) use ($callback) {
             $callback($service);
         });
@@ -61,7 +64,7 @@ abstract class Facade
         if (! static::isMock()) {
             $class = static::getMockableClass();
 
-            return \__Illuminate\tap($class ? Mockery::spy($class) : Mockery::spy(), function ($spy) {
+            return tap($class ? Mockery::spy($class) : Mockery::spy(), function ($spy) {
                 static::swap($spy);
             });
         }
@@ -75,7 +78,10 @@ abstract class Facade
     public static function partialMock()
     {
         $name = static::getFacadeAccessor();
-        $mock = static::isMock() ? static::$resolvedInstance[$name] : static::createFreshMockInstance();
+
+        $mock = static::isMock()
+            ? static::$resolvedInstance[$name]
+            : static::createFreshMockInstance();
 
         return $mock->makePartial();
     }
@@ -88,7 +94,10 @@ abstract class Facade
     public static function shouldReceive()
     {
         $name = static::getFacadeAccessor();
-        $mock = static::isMock() ? static::$resolvedInstance[$name] : static::createFreshMockInstance();
+
+        $mock = static::isMock()
+            ? static::$resolvedInstance[$name]
+            : static::createFreshMockInstance();
 
         return $mock->shouldReceive(...func_get_args());
     }
@@ -101,7 +110,10 @@ abstract class Facade
     public static function expects()
     {
         $name = static::getFacadeAccessor();
-        $mock = static::isMock() ? static::$resolvedInstance[$name] : static::createFreshMockInstance();
+
+        $mock = static::isMock()
+            ? static::$resolvedInstance[$name]
+            : static::createFreshMockInstance();
 
         return $mock->expects(...func_get_args());
     }
@@ -113,8 +125,9 @@ abstract class Facade
      */
     protected static function createFreshMockInstance()
     {
-        return \__Illuminate\tap(static::createMock(), function ($mock) {
+        return tap(static::createMock(), function ($mock) {
             static::swap($mock);
+
             $mock->shouldAllowMockingProtectedMethods();
         });
     }
@@ -140,7 +153,8 @@ abstract class Facade
     {
         $name = static::getFacadeAccessor();
 
-        return isset(static::$resolvedInstance[$name]) && static::$resolvedInstance[$name] instanceof LegacyMockInterface;
+        return isset(static::$resolvedInstance[$name]) &&
+               static::$resolvedInstance[$name] instanceof LegacyMockInterface;
     }
 
     /**
@@ -171,6 +185,19 @@ abstract class Facade
     }
 
     /**
+     * Determines whether a "fake" has been set as the facade instance.
+     *
+     * @return bool
+     */
+    protected static function isFake()
+    {
+        $name = static::getFacadeAccessor();
+
+        return isset(static::$resolvedInstance[$name]) &&
+               static::$resolvedInstance[$name] instanceof Fake;
+    }
+
+    /**
      * Get the root object behind the facade.
      *
      * @return mixed
@@ -185,7 +212,7 @@ abstract class Facade
      *
      * @return string
      *
-     * @throws RuntimeException
+     * @throws \RuntimeException
      */
     protected static function getFacadeAccessor()
     {
@@ -241,7 +268,48 @@ abstract class Facade
      */
     public static function defaultAliases()
     {
-        return \__Illuminate\collect(['App' => \Illuminate\Support\Facades\App::class, 'Arr' => Arr::class, 'Artisan' => \Illuminate\Support\Facades\Artisan::class, 'Auth' => \Illuminate\Support\Facades\Auth::class, 'Blade' => \Illuminate\Support\Facades\Blade::class, 'Broadcast' => \Illuminate\Support\Facades\Broadcast::class, 'Bus' => \Illuminate\Support\Facades\Bus::class, 'Cache' => \Illuminate\Support\Facades\Cache::class, 'Config' => \Illuminate\Support\Facades\Config::class, 'Cookie' => \Illuminate\Support\Facades\Cookie::class, 'Crypt' => \Illuminate\Support\Facades\Crypt::class, 'Date' => \Illuminate\Support\Facades\Date::class, 'DB' => \Illuminate\Support\Facades\DB::class, 'Eloquent' => Model::class, 'Event' => \Illuminate\Support\Facades\Event::class, 'File' => \Illuminate\Support\Facades\File::class, 'Gate' => \Illuminate\Support\Facades\Gate::class, 'Hash' => \Illuminate\Support\Facades\Hash::class, 'Http' => \Illuminate\Support\Facades\Http::class, 'Js' => Js::class, 'Lang' => \Illuminate\Support\Facades\Lang::class, 'Log' => \Illuminate\Support\Facades\Log::class, 'Mail' => \Illuminate\Support\Facades\Mail::class, 'Notification' => \Illuminate\Support\Facades\Notification::class, 'Password' => \Illuminate\Support\Facades\Password::class, 'Queue' => \Illuminate\Support\Facades\Queue::class, 'RateLimiter' => \Illuminate\Support\Facades\RateLimiter::class, 'Redirect' => \Illuminate\Support\Facades\Redirect::class, 'Request' => \Illuminate\Support\Facades\Request::class, 'Response' => \Illuminate\Support\Facades\Response::class, 'Route' => \Illuminate\Support\Facades\Route::class, 'Schema' => \Illuminate\Support\Facades\Schema::class, 'Session' => \Illuminate\Support\Facades\Session::class, 'Storage' => \Illuminate\Support\Facades\Storage::class, 'Str' => Str::class, 'URL' => \Illuminate\Support\Facades\URL::class, 'Validator' => \Illuminate\Support\Facades\Validator::class, 'View' => \Illuminate\Support\Facades\View::class, 'Vite' => \Illuminate\Support\Facades\Vite::class]);
+        return collect([
+            'App' => App::class,
+            'Arr' => Arr::class,
+            'Artisan' => Artisan::class,
+            'Auth' => Auth::class,
+            'Blade' => Blade::class,
+            'Broadcast' => Broadcast::class,
+            'Bus' => Bus::class,
+            'Cache' => Cache::class,
+            'Config' => Config::class,
+            'Cookie' => Cookie::class,
+            'Crypt' => Crypt::class,
+            'Date' => Date::class,
+            'DB' => DB::class,
+            'Eloquent' => Model::class,
+            'Event' => Event::class,
+            'File' => File::class,
+            'Gate' => Gate::class,
+            'Hash' => Hash::class,
+            'Http' => Http::class,
+            'Js' => Js::class,
+            'Lang' => Lang::class,
+            'Log' => Log::class,
+            'Mail' => Mail::class,
+            'Notification' => Notification::class,
+            'Password' => Password::class,
+            'Process' => Process::class,
+            'Queue' => Queue::class,
+            'RateLimiter' => RateLimiter::class,
+            'Redirect' => Redirect::class,
+            'Request' => Request::class,
+            'Response' => Response::class,
+            'Route' => Route::class,
+            'Schema' => Schema::class,
+            'Session' => Session::class,
+            'Storage' => Storage::class,
+            'Str' => Str::class,
+            'URL' => URL::class,
+            'Validator' => Validator::class,
+            'View' => View::class,
+            'Vite' => Vite::class,
+        ]);
     }
 
     /**
@@ -272,7 +340,7 @@ abstract class Facade
      * @param  array  $args
      * @return mixed
      *
-     * @throws RuntimeException
+     * @throws \RuntimeException
      */
     public static function __callStatic($method, $args)
     {
@@ -282,6 +350,6 @@ abstract class Facade
             throw new RuntimeException('A facade root has not been set.');
         }
 
-        return $instance->{$method}(...$args);
+        return $instance->$method(...$args);
     }
 }

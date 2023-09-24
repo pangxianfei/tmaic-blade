@@ -39,6 +39,7 @@ abstract class Manager
     /**
      * Create a new manager instance.
      *
+     * @param  \Illuminate\Contracts\Container\Container  $container
      * @return void
      */
     public function __construct(Container $container)
@@ -60,15 +61,18 @@ abstract class Manager
      * @param  string|null  $driver
      * @return mixed
      *
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     public function driver($driver = null)
     {
         $driver = $driver ?: $this->getDefaultDriver();
 
         if (is_null($driver)) {
-            throw new InvalidArgumentException(sprintf('Unable to resolve NULL driver for [%s].', static::class));
+            throw new InvalidArgumentException(sprintf(
+                'Unable to resolve NULL driver for [%s].', static::class
+            ));
         }
+
         // If the given driver has not been created before, we will create the instances
         // here and cache it so we can return it next time very quickly. If there is
         // already a driver created by this name, we'll just return that instance.
@@ -85,7 +89,7 @@ abstract class Manager
      * @param  string  $driver
      * @return mixed
      *
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     protected function createDriver($driver)
     {
@@ -94,15 +98,15 @@ abstract class Manager
         // callbacks allow developers to build their own "drivers" easily using Closures.
         if (isset($this->customCreators[$driver])) {
             return $this->callCustomCreator($driver);
-        } else {
-            $method = 'create'.\Illuminate\Support\Str::studly($driver).'Driver';
-
-            if (method_exists($this, $method)) {
-                return $this->{$method}();
-            }
         }
 
-        throw new InvalidArgumentException("Driver [{$driver}] not supported.");
+        $method = 'create'.Str::studly($driver).'Driver';
+
+        if (method_exists($this, $method)) {
+            return $this->$method();
+        }
+
+        throw new InvalidArgumentException("Driver [$driver] not supported.");
     }
 
     /**
@@ -120,6 +124,7 @@ abstract class Manager
      * Register a custom driver creator Closure.
      *
      * @param  string  $driver
+     * @param  \Closure  $callback
      * @return $this
      */
     public function extend($driver, Closure $callback)
@@ -152,6 +157,7 @@ abstract class Manager
     /**
      * Set the container instance used by the manager.
      *
+     * @param  \Illuminate\Contracts\Container\Container  $container
      * @return $this
      */
     public function setContainer(Container $container)
@@ -182,6 +188,6 @@ abstract class Manager
      */
     public function __call($method, $parameters)
     {
-        return $this->driver()->{$method}(...$parameters);
+        return $this->driver()->$method(...$parameters);
     }
 }

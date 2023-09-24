@@ -58,9 +58,10 @@ trait CompilesHelpers
     protected function compileVite($arguments)
     {
         $arguments ??= '()';
+
         $class = Vite::class;
 
-        return "<?php echo app('{$class}'){$arguments}; ?>";
+        return "<?php echo app('$class'){$arguments}; ?>";
     }
 
     /**
@@ -72,6 +73,6 @@ trait CompilesHelpers
     {
         $class = Vite::class;
 
-        return "<?php echo app('{$class}')->reactRefresh(); ?>";
+        return "<?php echo app('$class')->reactRefresh(); ?>";
     }
 }

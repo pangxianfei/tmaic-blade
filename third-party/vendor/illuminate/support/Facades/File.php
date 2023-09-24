@@ -6,6 +6,7 @@ namespace Illuminate\Support\Facades;
  * @method static bool exists(string $path)
  * @method static bool missing(string $path)
  * @method static string get(string $path, bool $lock = false)
+ * @method static array json(string $path, int $flags = 0, bool $lock = false)
  * @method static string sharedGet(string $path)
  * @method static mixed getRequire(string $path, array $data = [])
  * @method static mixed requireOnce(string $path, array $data = [])
@@ -57,7 +58,7 @@ namespace Illuminate\Support\Facades;
  *
  * @see \Illuminate\Filesystem\Filesystem
  */
-class File extends \Illuminate\Support\Facades\Facade
+class File extends Facade
 {
     /**
      * Get the registered name of the component.

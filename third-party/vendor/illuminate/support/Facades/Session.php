@@ -66,7 +66,7 @@ namespace Illuminate\Support\Facades;
  *
  * @see \Illuminate\Session\SessionManager
  */
-class Session extends \Illuminate\Support\Facades\Facade
+class Session extends Facade
 {
     /**
      * Get the registered name of the component.

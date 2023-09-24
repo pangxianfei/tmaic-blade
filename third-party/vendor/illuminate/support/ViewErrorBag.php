@@ -36,7 +36,7 @@ class ViewErrorBag implements Countable
      */
     public function getBag($key)
     {
-        return \Illuminate\Support\Arr::get($this->bags, $key) ?: new \Illuminate\Support\MessageBag();
+        return Arr::get($this->bags, $key) ?: new MessageBag;
     }
 
     /**
@@ -53,6 +53,7 @@ class ViewErrorBag implements Countable
      * Add a new MessageBag instance to the bags.
      *
      * @param  string  $key
+     * @param  \Illuminate\Contracts\Support\MessageBag  $bag
      * @return $this
      */
     public function put($key, MessageBagContract $bag)
@@ -74,6 +75,8 @@ class ViewErrorBag implements Countable
 
     /**
      * Get the number of messages in the default bag.
+     *
+     * @return int
      */
     public function count(): int
     {
@@ -89,7 +92,7 @@ class ViewErrorBag implements Countable
      */
     public function __call($method, $parameters)
     {
-        return $this->getBag('default')->{$method}(...$parameters);
+        return $this->getBag('default')->$method(...$parameters);
     }
 
     /**

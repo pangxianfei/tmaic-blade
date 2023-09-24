@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit855b9cd4faec8c788c376d9f12d5eec8
+class ComposerStaticInite0f91e7b47ef3fbd33e24854f8eebf4d
 {
     public static $files = array (
         '60799491728b879e74601d83e38b2cad' => __DIR__ . '/..' . '/illuminate/collections/helpers.php',
@@ -28,9 +28,9 @@ class ComposerStaticInit855b9cd4faec8c788c376d9f12d5eec8
         ),
         'Illuminate\\Support\\' => 
         array (
-            0 => __DIR__ . '/..' . '/illuminate/collections',
-            1 => __DIR__ . '/..' . '/illuminate/conditionable',
-            2 => __DIR__ . '/..' . '/illuminate/macroable',
+            0 => __DIR__ . '/..' . '/illuminate/conditionable',
+            1 => __DIR__ . '/..' . '/illuminate/macroable',
+            2 => __DIR__ . '/..' . '/illuminate/collections',
             3 => __DIR__ . '/..' . '/illuminate/support',
         ),
         'Illuminate\\Contracts\\' => 
@@ -99,6 +99,8 @@ class ComposerStaticInit855b9cd4faec8c788c376d9f12d5eec8
         'Illuminate\\Contracts\\Database\\Events\\MigrationEvent' => __DIR__ . '/..' . '/illuminate/contracts/Database/Events/MigrationEvent.php',
         'Illuminate\\Contracts\\Database\\ModelIdentifier' => __DIR__ . '/..' . '/illuminate/contracts/Database/ModelIdentifier.php',
         'Illuminate\\Contracts\\Database\\Query\\Builder' => __DIR__ . '/..' . '/illuminate/contracts/Database/Query/Builder.php',
+        'Illuminate\\Contracts\\Database\\Query\\ConditionExpression' => __DIR__ . '/..' . '/illuminate/contracts/Database/Query/ConditionExpression.php',
+        'Illuminate\\Contracts\\Database\\Query\\Expression' => __DIR__ . '/..' . '/illuminate/contracts/Database/Query/Expression.php',
         'Illuminate\\Contracts\\Debug\\ExceptionHandler' => __DIR__ . '/..' . '/illuminate/contracts/Debug/ExceptionHandler.php',
         'Illuminate\\Contracts\\Encryption\\DecryptException' => __DIR__ . '/..' . '/illuminate/contracts/Encryption/DecryptException.php',
         'Illuminate\\Contracts\\Encryption\\EncryptException' => __DIR__ . '/..' . '/illuminate/contracts/Encryption/EncryptException.php',
@@ -129,6 +131,8 @@ class ComposerStaticInit855b9cd4faec8c788c376d9f12d5eec8
         'Illuminate\\Contracts\\Pagination\\Paginator' => __DIR__ . '/..' . '/illuminate/contracts/Pagination/Paginator.php',
         'Illuminate\\Contracts\\Pipeline\\Hub' => __DIR__ . '/..' . '/illuminate/contracts/Pipeline/Hub.php',
         'Illuminate\\Contracts\\Pipeline\\Pipeline' => __DIR__ . '/..' . '/illuminate/contracts/Pipeline/Pipeline.php',
+        'Illuminate\\Contracts\\Process\\InvokedProcess' => __DIR__ . '/..' . '/illuminate/contracts/Process/InvokedProcess.php',
+        'Illuminate\\Contracts\\Process\\ProcessResult' => __DIR__ . '/..' . '/illuminate/contracts/Process/ProcessResult.php',
         'Illuminate\\Contracts\\Queue\\ClearableQueue' => __DIR__ . '/..' . '/illuminate/contracts/Queue/ClearableQueue.php',
         'Illuminate\\Contracts\\Queue\\EntityNotFoundException' => __DIR__ . '/..' . '/illuminate/contracts/Queue/EntityNotFoundException.php',
         'Illuminate\\Contracts\\Queue\\EntityResolver' => __DIR__ . '/..' . '/illuminate/contracts/Queue/EntityResolver.php',
@@ -174,6 +178,7 @@ class ComposerStaticInit855b9cd4faec8c788c376d9f12d5eec8
         'Illuminate\\Contracts\\Validation\\Rule' => __DIR__ . '/..' . '/illuminate/contracts/Validation/Rule.php',
         'Illuminate\\Contracts\\Validation\\UncompromisedVerifier' => __DIR__ . '/..' . '/illuminate/contracts/Validation/UncompromisedVerifier.php',
         'Illuminate\\Contracts\\Validation\\ValidatesWhenResolved' => __DIR__ . '/..' . '/illuminate/contracts/Validation/ValidatesWhenResolved.php',
+        'Illuminate\\Contracts\\Validation\\ValidationRule' => __DIR__ . '/..' . '/illuminate/contracts/Validation/ValidationRule.php',
         'Illuminate\\Contracts\\Validation\\Validator' => __DIR__ . '/..' . '/illuminate/contracts/Validation/Validator.php',
         'Illuminate\\Contracts\\Validation\\ValidatorAwareRule' => __DIR__ . '/..' . '/illuminate/contracts/Validation/ValidatorAwareRule.php',
         'Illuminate\\Contracts\\View\\Engine' => __DIR__ . '/..' . '/illuminate/contracts/View/Engine.php',
@@ -188,6 +193,7 @@ class ComposerStaticInit855b9cd4faec8c788c376d9f12d5eec8
         'Illuminate\\Support\\Composer' => __DIR__ . '/..' . '/illuminate/support/Composer.php',
         'Illuminate\\Support\\ConfigurationUrlParser' => __DIR__ . '/..' . '/illuminate/support/ConfigurationUrlParser.php',
         'Illuminate\\Support\\DateFactory' => __DIR__ . '/..' . '/illuminate/support/DateFactory.php',
+        'Illuminate\\Support\\DefaultProviders' => __DIR__ . '/..' . '/illuminate/support/DefaultProviders.php',
         'Illuminate\\Support\\Enumerable' => __DIR__ . '/..' . '/illuminate/collections/Enumerable.php',
         'Illuminate\\Support\\Env' => __DIR__ . '/..' . '/illuminate/support/Env.php',
         'Illuminate\\Support\\Exceptions\\MathException' => __DIR__ . '/..' . '/illuminate/support/Exceptions/MathException.php',
@@ -215,6 +221,8 @@ class ComposerStaticInit855b9cd4faec8c788c376d9f12d5eec8
         'Illuminate\\Support\\Facades\\Notification' => __DIR__ . '/..' . '/illuminate/support/Facades/Notification.php',
         'Illuminate\\Support\\Facades\\ParallelTesting' => __DIR__ . '/..' . '/illuminate/support/Facades/ParallelTesting.php',
         'Illuminate\\Support\\Facades\\Password' => __DIR__ . '/..' . '/illuminate/support/Facades/Password.php',
+        'Illuminate\\Support\\Facades\\Pipeline' => __DIR__ . '/..' . '/illuminate/support/Facades/Pipeline.php',
+        'Illuminate\\Support\\Facades\\Process' => __DIR__ . '/..' . '/illuminate/support/Facades/Process.php',
         'Illuminate\\Support\\Facades\\Queue' => __DIR__ . '/..' . '/illuminate/support/Facades/Queue.php',
         'Illuminate\\Support\\Facades\\RateLimiter' => __DIR__ . '/..' . '/illuminate/support/Facades/RateLimiter.php',
         'Illuminate\\Support\\Facades\\Redirect' => __DIR__ . '/..' . '/illuminate/support/Facades/Redirect.php',
@@ -249,12 +257,14 @@ class ComposerStaticInit855b9cd4faec8c788c376d9f12d5eec8
         'Illuminate\\Support\\ProcessUtils' => __DIR__ . '/..' . '/illuminate/support/ProcessUtils.php',
         'Illuminate\\Support\\Reflector' => __DIR__ . '/..' . '/illuminate/support/Reflector.php',
         'Illuminate\\Support\\ServiceProvider' => __DIR__ . '/..' . '/illuminate/support/ServiceProvider.php',
+        'Illuminate\\Support\\Sleep' => __DIR__ . '/..' . '/illuminate/support/Sleep.php',
         'Illuminate\\Support\\Str' => __DIR__ . '/..' . '/illuminate/support/Str.php',
         'Illuminate\\Support\\Stringable' => __DIR__ . '/..' . '/illuminate/support/Stringable.php',
         'Illuminate\\Support\\Testing\\Fakes\\BatchFake' => __DIR__ . '/..' . '/illuminate/support/Testing/Fakes/BatchFake.php',
         'Illuminate\\Support\\Testing\\Fakes\\BatchRepositoryFake' => __DIR__ . '/..' . '/illuminate/support/Testing/Fakes/BatchRepositoryFake.php',
         'Illuminate\\Support\\Testing\\Fakes\\BusFake' => __DIR__ . '/..' . '/illuminate/support/Testing/Fakes/BusFake.php',
         'Illuminate\\Support\\Testing\\Fakes\\EventFake' => __DIR__ . '/..' . '/illuminate/support/Testing/Fakes/EventFake.php',
+        'Illuminate\\Support\\Testing\\Fakes\\Fake' => __DIR__ . '/..' . '/illuminate/support/Testing/Fakes/Fake.php',
         'Illuminate\\Support\\Testing\\Fakes\\MailFake' => __DIR__ . '/..' . '/illuminate/support/Testing/Fakes/MailFake.php',
         'Illuminate\\Support\\Testing\\Fakes\\NotificationFake' => __DIR__ . '/..' . '/illuminate/support/Testing/Fakes/NotificationFake.php',
         'Illuminate\\Support\\Testing\\Fakes\\PendingBatchFake' => __DIR__ . '/..' . '/illuminate/support/Testing/Fakes/PendingBatchFake.php',
@@ -327,9 +337,9 @@ class ComposerStaticInit855b9cd4faec8c788c376d9f12d5eec8
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit855b9cd4faec8c788c376d9f12d5eec8::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit855b9cd4faec8c788c376d9f12d5eec8::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit855b9cd4faec8c788c376d9f12d5eec8::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInite0f91e7b47ef3fbd33e24854f8eebf4d::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInite0f91e7b47ef3fbd33e24854f8eebf4d::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInite0f91e7b47ef3fbd33e24854f8eebf4d::$classMap;
 
         }, null, ClassLoader::class);
     }

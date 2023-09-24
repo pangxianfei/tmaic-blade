@@ -1,25 +1,19 @@
 <?php
 
-namespace __Illuminate;
-
-use BackedEnum;
-use Closure;
-use Countable;
-use Exception;
 use Illuminate\Contracts\Support\DeferringDisplayableValue;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Env;
 use Illuminate\Support\HigherOrderTapProxy;
 use Illuminate\Support\Optional;
+use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
-use RuntimeException;
-use Throwable;
 
-if (! function_exists('__Illuminate\\\__Illuminate\append_config')) {
+if (! function_exists('append_config')) {
     /**
      * Assign high numeric IDs to a config item to force appending.
      *
+     * @param  array  $array
      * @return array
      */
     function append_config(array $array)
@@ -29,6 +23,7 @@ if (! function_exists('__Illuminate\\\__Illuminate\append_config')) {
         foreach ($array as $key => $value) {
             if (is_numeric($key)) {
                 $start++;
+
                 $array[$start] = Arr::pull($array, $key);
             }
         }
@@ -37,7 +32,7 @@ if (! function_exists('__Illuminate\\\__Illuminate\append_config')) {
     }
 }
 
-if (! function_exists('__Illuminate\\\__Illuminate\blank')) {
+if (! function_exists('blank')) {
     /**
      * Determine if the given value is "blank".
      *
@@ -66,7 +61,7 @@ if (! function_exists('__Illuminate\\\__Illuminate\blank')) {
     }
 }
 
-if (! function_exists('__Illuminate\\\__Illuminate\class_basename')) {
+if (! function_exists('class_basename')) {
     /**
      * Get the class "basename" of the given object / class.
      *
@@ -81,7 +76,7 @@ if (! function_exists('__Illuminate\\\__Illuminate\class_basename')) {
     }
 }
 
-if (! function_exists('__Illuminate\\\__Illuminate\class_uses_recursive')) {
+if (! function_exists('class_uses_recursive')) {
     /**
      * Returns all traits used by a class, its parent classes and trait of their traits.
      *
@@ -93,21 +88,22 @@ if (! function_exists('__Illuminate\\\__Illuminate\class_uses_recursive')) {
         if (is_object($class)) {
             $class = get_class($class);
         }
+
         $results = [];
 
         foreach (array_reverse(class_parents($class)) + [$class => $class] as $class) {
-            $results += \__Illuminate\trait_uses_recursive($class);
+            $results += trait_uses_recursive($class);
         }
 
         return array_unique($results);
     }
 }
 
-if (! function_exists('__Illuminate\\\__Illuminate\e')) {
+if (! function_exists('e')) {
     /**
      * Encode HTML special characters in a string.
      *
-     * @param  \Illuminate\Contracts\Support\DeferringDisplayableValue|\Illuminate\Contracts\Support\Htmlable|BackedEnum|string|null  $value
+     * @param  \Illuminate\Contracts\Support\DeferringDisplayableValue|\Illuminate\Contracts\Support\Htmlable|\BackedEnum|string|null  $value
      * @param  bool  $doubleEncode
      * @return string
      */
@@ -125,11 +121,11 @@ if (! function_exists('__Illuminate\\\__Illuminate\e')) {
             $value = $value->value;
         }
 
-        return htmlspecialchars($value ?? '', \ENT_QUOTES, 'UTF-8', $doubleEncode);
+        return htmlspecialchars($value ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', $doubleEncode);
     }
 }
 
-if (! function_exists('__Illuminate\\\__Illuminate\env')) {
+if (! function_exists('env')) {
     /**
      * Gets the value of an environment variable.
      *
@@ -143,7 +139,7 @@ if (! function_exists('__Illuminate\\\__Illuminate\env')) {
     }
 }
 
-if (! function_exists('__Illuminate\\\__Illuminate\filled')) {
+if (! function_exists('filled')) {
     /**
      * Determine if a value is "filled".
      *
@@ -152,11 +148,11 @@ if (! function_exists('__Illuminate\\\__Illuminate\filled')) {
      */
     function filled($value)
     {
-        return ! \__Illuminate\blank($value);
+        return ! blank($value);
     }
 }
 
-if (! function_exists('__Illuminate\\\__Illuminate\object_get')) {
+if (! function_exists('object_get')) {
     /**
      * Get an item from an object using "dot" notation.
      *
@@ -173,8 +169,9 @@ if (! function_exists('__Illuminate\\\__Illuminate\object_get')) {
 
         foreach (explode('.', $key) as $segment) {
             if (! is_object($object) || ! isset($object->{$segment})) {
-                return \__Illuminate\value($default);
+                return value($default);
             }
+
             $object = $object->{$segment};
         }
 
@@ -182,11 +179,12 @@ if (! function_exists('__Illuminate\\\__Illuminate\object_get')) {
     }
 }
 
-if (! function_exists('__Illuminate\\\__Illuminate\optional')) {
+if (! function_exists('optional')) {
     /**
      * Provide access to optional objects.
      *
      * @param  mixed  $value
+     * @param  callable|null  $callback
      * @return mixed
      */
     function optional($value = null, callable $callback = null)
@@ -199,11 +197,12 @@ if (! function_exists('__Illuminate\\\__Illuminate\optional')) {
     }
 }
 
-if (! function_exists('__Illuminate\\\__Illuminate\preg_replace_array')) {
+if (! function_exists('preg_replace_array')) {
     /**
      * Replace a given pattern with each value in the array in sequentially.
      *
      * @param  string  $pattern
+     * @param  array  $replacements
      * @param  string  $subject
      * @return string
      */
@@ -217,26 +216,30 @@ if (! function_exists('__Illuminate\\\__Illuminate\preg_replace_array')) {
     }
 }
 
-if (! function_exists('__Illuminate\\\__Illuminate\retry')) {
+if (! function_exists('retry')) {
     /**
      * Retry an operation a given number of times.
      *
      * @param  int|array  $times
-     * @param  int|Closure  $sleepMilliseconds
+     * @param  callable  $callback
+     * @param  int|\Closure  $sleepMilliseconds
      * @param  callable|null  $when
      * @return mixed
      *
-     * @throws Exception
+     * @throws \Exception
      */
     function retry($times, callable $callback, $sleepMilliseconds = 0, $when = null)
     {
         $attempts = 0;
+
         $backoff = [];
 
         if (is_array($times)) {
             $backoff = $times;
+
             $times = count($times) + 1;
         }
+
         beginning:
         $attempts++;
         $times--;
@@ -244,13 +247,14 @@ if (! function_exists('__Illuminate\\\__Illuminate\retry')) {
         try {
             return $callback($attempts);
         } catch (Exception $e) {
-            if ($times < 1 || $when && ! $when($e)) {
+            if ($times < 1 || ($when && ! $when($e))) {
                 throw $e;
             }
+
             $sleepMilliseconds = $backoff[$attempts - 1] ?? $sleepMilliseconds;
 
             if ($sleepMilliseconds) {
-                usleep(\__Illuminate\value($sleepMilliseconds, $attempts, $e) * 1000);
+                Sleep::usleep(value($sleepMilliseconds, $attempts, $e) * 1000);
             }
 
             goto beginning;
@@ -258,7 +262,7 @@ if (! function_exists('__Illuminate\\\__Illuminate\retry')) {
     }
 }
 
-if (! function_exists('__Illuminate\\\__Illuminate\str')) {
+if (! function_exists('str')) {
     /**
      * Get a new stringable object from the given string.
      *
@@ -286,7 +290,7 @@ if (! function_exists('__Illuminate\\\__Illuminate\str')) {
     }
 }
 
-if (! function_exists('__Illuminate\\\__Illuminate\tap')) {
+if (! function_exists('tap')) {
     /**
      * Call the given Closure with the given value then return the value.
      *
@@ -299,22 +303,25 @@ if (! function_exists('__Illuminate\\\__Illuminate\tap')) {
         if (is_null($callback)) {
             return new HigherOrderTapProxy($value);
         }
+
         $callback($value);
 
         return $value;
     }
 }
 
-if (! function_exists('__Illuminate\\\__Illuminate\throw_if')) {
+if (! function_exists('throw_if')) {
     /**
      * Throw the given exception if the given condition is true.
      *
+     * @template TException of \Throwable
+     *
      * @param  mixed  $condition
-     * @param  Throwable|string  $exception
+     * @param  TException|class-string<TException>|string  $exception
      * @param  mixed  ...$parameters
      * @return mixed
      *
-     * @throws Throwable
+     * @throws TException
      */
     function throw_if($condition, $exception = 'RuntimeException', ...$parameters)
     {
@@ -330,30 +337,32 @@ if (! function_exists('__Illuminate\\\__Illuminate\throw_if')) {
     }
 }
 
-if (! function_exists('__Illuminate\\\__Illuminate\throw_unless')) {
+if (! function_exists('throw_unless')) {
     /**
      * Throw the given exception unless the given condition is true.
      *
+     * @template TException of \Throwable
+     *
      * @param  mixed  $condition
-     * @param  Throwable|string  $exception
+     * @param  TException|class-string<TException>|string  $exception
      * @param  mixed  ...$parameters
      * @return mixed
      *
-     * @throws Throwable
+     * @throws TException
      */
     function throw_unless($condition, $exception = 'RuntimeException', ...$parameters)
     {
-        \__Illuminate\throw_if(! $condition, $exception, ...$parameters);
+        throw_if(! $condition, $exception, ...$parameters);
 
         return $condition;
     }
 }
 
-if (! function_exists('__Illuminate\\\__Illuminate\trait_uses_recursive')) {
+if (! function_exists('trait_uses_recursive')) {
     /**
      * Returns all traits used by a trait and its traits.
      *
-     * @param  string  $trait
+     * @param  object|string  $trait
      * @return array
      */
     function trait_uses_recursive($trait)
@@ -361,24 +370,29 @@ if (! function_exists('__Illuminate\\\__Illuminate\trait_uses_recursive')) {
         $traits = class_uses($trait) ?: [];
 
         foreach ($traits as $trait) {
-            $traits += \__Illuminate\trait_uses_recursive($trait);
+            $traits += trait_uses_recursive($trait);
         }
 
         return $traits;
     }
 }
 
-if (! function_exists('__Illuminate\\\__Illuminate\transform')) {
+if (! function_exists('transform')) {
     /**
      * Transform the given value if it is present.
      *
-     * @param  mixed  $value
-     * @param  mixed  $default
-     * @return mixed|null
+     * @template TValue of mixed
+     * @template TReturn of mixed
+     * @template TDefault of mixed
+     *
+     * @param  TValue  $value
+     * @param  callable(TValue): TReturn  $callback
+     * @param  TDefault|callable(TValue): TDefault|null  $default
+     * @return ($value is empty ? ($default is null ? null : TDefault) : TReturn)
      */
     function transform($value, callable $callback, $default = null)
     {
-        if (\__Illuminate\filled($value)) {
+        if (filled($value)) {
             return $callback($value);
         }
 
@@ -390,7 +404,7 @@ if (! function_exists('__Illuminate\\\__Illuminate\transform')) {
     }
 }
 
-if (! function_exists('__Illuminate\\\__Illuminate\windows_os')) {
+if (! function_exists('windows_os')) {
     /**
      * Determine whether the current environment is Windows based.
      *
@@ -398,11 +412,11 @@ if (! function_exists('__Illuminate\\\__Illuminate\windows_os')) {
      */
     function windows_os()
     {
-        return \PHP_OS_FAMILY === 'Windows';
+        return PHP_OS_FAMILY === 'Windows';
     }
 }
 
-if (! function_exists('__Illuminate\\\__Illuminate\with')) {
+if (! function_exists('with')) {
     /**
      * Return the given value, optionally passed through the given callback.
      *

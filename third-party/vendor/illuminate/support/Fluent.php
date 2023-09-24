@@ -3,7 +3,6 @@
 namespace Illuminate\Support;
 
 use ArrayAccess;
-use Closure;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use JsonSerializable;
@@ -43,7 +42,7 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
      * @template TGetDefault
      *
      * @param  TKey  $key
-     * @param  TGetDefault|(Closure(): TGetDefault)  $default
+     * @param  TGetDefault|(\Closure(): TGetDefault)  $default
      * @return TValue|TGetDefault
      */
     public function get($key, $default = null)
@@ -52,7 +51,7 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
             return $this->attributes[$key];
         }
 
-        return \__Illuminate\value($default);
+        return value($default);
     }
 
     /**
@@ -100,6 +99,7 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
      * Determine if the given offset exists.
      *
      * @param  TKey  $offset
+     * @return bool
      */
     public function offsetExists($offset): bool
     {
@@ -122,6 +122,7 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
      *
      * @param  TKey  $offset
      * @param  TValue  $value
+     * @return void
      */
     public function offsetSet($offset, $value): void
     {
@@ -132,6 +133,7 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
      * Unset the value at the given offset.
      *
      * @param  TKey  $offset
+     * @return void
      */
     public function offsetUnset($offset): void
     {

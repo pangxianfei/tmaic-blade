@@ -66,20 +66,22 @@ class Optional implements ArrayAccess
      * Determine if an item exists at an offset.
      *
      * @param  mixed  $key
+     * @return bool
      */
     public function offsetExists($key): bool
     {
-        return \Illuminate\Support\Arr::accessible($this->value) && \Illuminate\Support\Arr::exists($this->value, $key);
+        return Arr::accessible($this->value) && Arr::exists($this->value, $key);
     }
 
     /**
      * Get an item at a given offset.
      *
      * @param  mixed  $key
+     * @return mixed
      */
     public function offsetGet($key): mixed
     {
-        return \Illuminate\Support\Arr::get($this->value, $key);
+        return Arr::get($this->value, $key);
     }
 
     /**
@@ -87,10 +89,11 @@ class Optional implements ArrayAccess
      *
      * @param  mixed  $key
      * @param  mixed  $value
+     * @return void
      */
     public function offsetSet($key, $value): void
     {
-        if (\Illuminate\Support\Arr::accessible($this->value)) {
+        if (Arr::accessible($this->value)) {
             $this->value[$key] = $value;
         }
     }
@@ -99,10 +102,11 @@ class Optional implements ArrayAccess
      * Unset the item at a given offset.
      *
      * @param  string  $key
+     * @return void
      */
     public function offsetUnset($key): void
     {
-        if (\Illuminate\Support\Arr::accessible($this->value)) {
+        if (Arr::accessible($this->value)) {
             unset($this->value[$key]);
         }
     }

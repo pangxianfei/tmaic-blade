@@ -93,7 +93,7 @@ abstract class MultipleInstanceManager
      * @param  string  $name
      * @return mixed
      *
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     protected function resolve($name)
     {
@@ -123,6 +123,7 @@ abstract class MultipleInstanceManager
     /**
      * Call a custom instance creator.
      *
+     * @param  array  $config
      * @return mixed
      */
     protected function callCustomCreator(array $config)
@@ -158,6 +159,7 @@ abstract class MultipleInstanceManager
     public function purge($name = null)
     {
         $name ??= $this->getDefaultInstance();
+
         unset($this->instances[$name]);
     }
 
@@ -165,6 +167,7 @@ abstract class MultipleInstanceManager
      * Register a custom instance creator Closure.
      *
      * @param  string  $name
+     * @param  \Closure  $callback
      * @return $this
      */
     public function extend($name, Closure $callback)
@@ -183,6 +186,6 @@ abstract class MultipleInstanceManager
      */
     public function __call($method, $parameters)
     {
-        return $this->instance()->{$method}(...$parameters);
+        return $this->instance()->$method(...$parameters);
     }
 }

@@ -19,6 +19,7 @@ class ValidatedInput implements ValidatedData
     /**
      * Create a new validated input container.
      *
+     * @param  array  $input
      * @return void
      */
     public function __construct(array $input)
@@ -37,7 +38,7 @@ class ValidatedInput implements ValidatedData
         $keys = is_array($keys) ? $keys : func_get_args();
 
         foreach ($keys as $key) {
-            if (! \Illuminate\Support\Arr::has($this->input, $key)) {
+            if (! Arr::has($this->input, $key)) {
                 return false;
             }
         }
@@ -65,14 +66,16 @@ class ValidatedInput implements ValidatedData
     public function only($keys)
     {
         $results = [];
+
         $input = $this->input;
-        $placeholder = new stdClass();
+
+        $placeholder = new stdClass;
 
         foreach (is_array($keys) ? $keys : func_get_args() as $key) {
-            $value = \__Illuminate\data_get($input, $key, $placeholder);
+            $value = data_get($input, $key, $placeholder);
 
             if ($value !== $placeholder) {
-                \Illuminate\Support\Arr::set($results, $key, $value);
+                Arr::set($results, $key, $value);
             }
         }
 
@@ -88,8 +91,10 @@ class ValidatedInput implements ValidatedData
     public function except($keys)
     {
         $keys = is_array($keys) ? $keys : func_get_args();
+
         $results = $this->input;
-        \Illuminate\Support\Arr::forget($results, $keys);
+
+        Arr::forget($results, $keys);
 
         return $results;
     }
@@ -97,6 +102,7 @@ class ValidatedInput implements ValidatedData
     /**
      * Merge the validated input with the given array of additional data.
      *
+     * @param  array  $items
      * @return static
      */
     public function merge(array $items)
@@ -111,7 +117,7 @@ class ValidatedInput implements ValidatedData
      */
     public function collect()
     {
-        return new \Illuminate\Support\Collection($this->input);
+        return new Collection($this->input);
     }
 
     /**
@@ -182,6 +188,7 @@ class ValidatedInput implements ValidatedData
      * Determine if an item exists at an offset.
      *
      * @param  mixed  $key
+     * @return bool
      */
     public function offsetExists($key): bool
     {
@@ -192,6 +199,7 @@ class ValidatedInput implements ValidatedData
      * Get an item at a given offset.
      *
      * @param  mixed  $key
+     * @return mixed
      */
     public function offsetGet($key): mixed
     {
@@ -203,6 +211,7 @@ class ValidatedInput implements ValidatedData
      *
      * @param  mixed  $key
      * @param  mixed  $value
+     * @return void
      */
     public function offsetSet($key, $value): void
     {
@@ -217,6 +226,7 @@ class ValidatedInput implements ValidatedData
      * Unset the item at a given offset.
      *
      * @param  string  $key
+     * @return void
      */
     public function offsetUnset($key): void
     {
@@ -226,7 +236,7 @@ class ValidatedInput implements ValidatedData
     /**
      * Get an iterator for the input.
      *
-     * @return ArrayIterator
+     * @return \ArrayIterator
      */
     public function getIterator(): Traversable
     {

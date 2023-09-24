@@ -100,7 +100,7 @@ namespace Illuminate\Support\Facades;
  *
  * @see \Illuminate\Routing\Router
  */
-class Route extends \Illuminate\Support\Facades\Facade
+class Route extends Facade
 {
     /**
      * Get the registered name of the component.

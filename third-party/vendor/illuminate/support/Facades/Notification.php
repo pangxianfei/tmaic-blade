@@ -40,7 +40,7 @@ use Illuminate\Support\Testing\Fakes\NotificationFake;
  * @see \Illuminate\Notifications\ChannelManager
  * @see \Illuminate\Support\Testing\Fakes\NotificationFake
  */
-class Notification extends \Illuminate\Support\Facades\Facade
+class Notification extends Facade
 {
     /**
      * Replace the bound instance with a fake.
@@ -49,9 +49,9 @@ class Notification extends \Illuminate\Support\Facades\Facade
      */
     public static function fake()
     {
-        static::swap($fake = new NotificationFake());
-
-        return $fake;
+        return tap(new NotificationFake, function ($fake) {
+            static::swap($fake);
+        });
     }
 
     /**
@@ -63,7 +63,7 @@ class Notification extends \Illuminate\Support\Facades\Facade
      */
     public static function route($channel, $route)
     {
-        return (new AnonymousNotifiable())->route($channel, $route);
+        return (new AnonymousNotifiable)->route($channel, $route);
     }
 
     /**

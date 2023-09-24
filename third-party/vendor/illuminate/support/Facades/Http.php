@@ -2,10 +2,12 @@
 
 namespace Illuminate\Support\Facades;
 
-use Closure;
 use Illuminate\Http\Client\Factory;
 
 /**
+ * @method static \Illuminate\Http\Client\Factory globalMiddleware(callable $middleware)
+ * @method static \Illuminate\Http\Client\Factory globalRequestMiddleware(callable $middleware)
+ * @method static \Illuminate\Http\Client\Factory globalResponseMiddleware(callable $middleware)
  * @method static \GuzzleHttp\Promise\PromiseInterface response(array|string|null $body = null, int $status = 200, array $headers = [])
  * @method static \Illuminate\Http\Client\ResponseSequence sequence(array $responses = [])
  * @method static \Illuminate\Http\Client\Factory allowStrayRequests()
@@ -24,20 +26,23 @@ use Illuminate\Http\Client\Factory;
  * @method static void flushMacros()
  * @method static mixed macroCall(string $method, array $parameters)
  * @method static \Illuminate\Http\Client\PendingRequest baseUrl(string $url)
- * @method static \Illuminate\Http\Client\PendingRequest withBody(string $content, string $contentType)
+ * @method static \Illuminate\Http\Client\PendingRequest withBody(string $content, string $contentType = 'application/json')
  * @method static \Illuminate\Http\Client\PendingRequest asJson()
  * @method static \Illuminate\Http\Client\PendingRequest asForm()
  * @method static \Illuminate\Http\Client\PendingRequest attach(string|array $name, string|resource $contents = '', string|null $filename = null, array $headers = [])
  * @method static \Illuminate\Http\Client\PendingRequest asMultipart()
  * @method static \Illuminate\Http\Client\PendingRequest bodyFormat(string $format)
+ * @method static \Illuminate\Http\Client\PendingRequest withQueryParameters(array $parameters)
  * @method static \Illuminate\Http\Client\PendingRequest contentType(string $contentType)
  * @method static \Illuminate\Http\Client\PendingRequest acceptJson()
  * @method static \Illuminate\Http\Client\PendingRequest accept(string $contentType)
  * @method static \Illuminate\Http\Client\PendingRequest withHeaders(array $headers)
+ * @method static \Illuminate\Http\Client\PendingRequest withHeader(string $name, mixed $value)
+ * @method static \Illuminate\Http\Client\PendingRequest replaceHeaders(array $headers)
  * @method static \Illuminate\Http\Client\PendingRequest withBasicAuth(string $username, string $password)
  * @method static \Illuminate\Http\Client\PendingRequest withDigestAuth(string $username, string $password)
  * @method static \Illuminate\Http\Client\PendingRequest withToken(string $token, string $type = 'Bearer')
- * @method static \Illuminate\Http\Client\PendingRequest withUserAgent(string $userAgent)
+ * @method static \Illuminate\Http\Client\PendingRequest withUserAgent(string|bool $userAgent)
  * @method static \Illuminate\Http\Client\PendingRequest withUrlParameters(array $parameters = [])
  * @method static \Illuminate\Http\Client\PendingRequest withCookies(array $cookies, string $domain)
  * @method static \Illuminate\Http\Client\PendingRequest maxRedirects(int $max)
@@ -46,9 +51,11 @@ use Illuminate\Http\Client\Factory;
  * @method static \Illuminate\Http\Client\PendingRequest sink(string|resource $to)
  * @method static \Illuminate\Http\Client\PendingRequest timeout(int $seconds)
  * @method static \Illuminate\Http\Client\PendingRequest connectTimeout(int $seconds)
- * @method static \Illuminate\Http\Client\PendingRequest retry(int $times, int $sleepMilliseconds = 0, callable|null $when = null, bool $throw = true)
+ * @method static \Illuminate\Http\Client\PendingRequest retry(int $times, \Closure|int $sleepMilliseconds = 0, callable|null $when = null, bool $throw = true)
  * @method static \Illuminate\Http\Client\PendingRequest withOptions(array $options)
  * @method static \Illuminate\Http\Client\PendingRequest withMiddleware(callable $middleware)
+ * @method static \Illuminate\Http\Client\PendingRequest withRequestMiddleware(callable $middleware)
+ * @method static \Illuminate\Http\Client\PendingRequest withResponseMiddleware(callable $middleware)
  * @method static \Illuminate\Http\Client\PendingRequest beforeSending(callable $callback)
  * @method static \Illuminate\Http\Client\PendingRequest throw(callable|null $callback = null)
  * @method static \Illuminate\Http\Client\PendingRequest throwIf(callable|bool $condition, callable|null $throwCallback = null)
@@ -83,7 +90,7 @@ use Illuminate\Http\Client\Factory;
  *
  * @see \Illuminate\Http\Client\Factory
  */
-class Http extends \Illuminate\Support\Facades\Facade
+class Http extends Facade
 {
     /**
      * Get the registered name of the component.
@@ -98,12 +105,12 @@ class Http extends \Illuminate\Support\Facades\Facade
     /**
      * Register a stub callable that will intercept requests and be able to return stub responses.
      *
-     * @param  Closure|array  $callback
+     * @param  \Closure|array  $callback
      * @return \Illuminate\Http\Client\Factory
      */
     public static function fake($callback = null)
     {
-        return \__Illuminate\tap(static::getFacadeRoot(), function ($fake) use ($callback) {
+        return tap(static::getFacadeRoot(), function ($fake) use ($callback) {
             static::swap($fake->fake($callback));
         });
     }
@@ -111,11 +118,12 @@ class Http extends \Illuminate\Support\Facades\Facade
     /**
      * Register a response sequence for the given URL pattern.
      *
+     * @param  string  $urlPattern
      * @return \Illuminate\Http\Client\ResponseSequence
      */
     public static function fakeSequence(string $urlPattern = '*')
     {
-        $fake = \__Illuminate\tap(static::getFacadeRoot(), function ($fake) {
+        $fake = tap(static::getFacadeRoot(), function ($fake) {
             static::swap($fake);
         });
 
@@ -129,7 +137,7 @@ class Http extends \Illuminate\Support\Facades\Facade
      */
     public static function preventStrayRequests()
     {
-        return \__Illuminate\tap(static::getFacadeRoot(), function ($fake) {
+        return tap(static::getFacadeRoot(), function ($fake) {
             static::swap($fake->preventStrayRequests());
         });
     }
@@ -143,7 +151,7 @@ class Http extends \Illuminate\Support\Facades\Facade
      */
     public static function stubUrl($url, $callback)
     {
-        return \__Illuminate\tap(static::getFacadeRoot(), function ($fake) use ($url, $callback) {
+        return tap(static::getFacadeRoot(), function ($fake) use ($url, $callback) {
             static::swap($fake->stubUrl($url, $callback));
         });
     }

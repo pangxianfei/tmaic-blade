@@ -25,7 +25,7 @@ namespace Illuminate\Support\Facades;
  * @method static void dropAllTables()
  * @method static void dropAllViews()
  * @method static void dropAllTypes()
- * @method static void getAllTables()
+ * @method static array getAllTables()
  * @method static void rename(string $from, string $to)
  * @method static bool enableForeignKeyConstraints()
  * @method static bool disableForeignKeyConstraints()
@@ -36,7 +36,7 @@ namespace Illuminate\Support\Facades;
  *
  * @see \Illuminate\Database\Schema\Builder
  */
-class Schema extends \Illuminate\Support\Facades\Facade
+class Schema extends Facade
 {
     /**
      * Indicates if the resolved facade should be cached.

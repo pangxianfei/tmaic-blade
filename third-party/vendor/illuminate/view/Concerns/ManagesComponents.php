@@ -2,11 +2,9 @@
 
 namespace Illuminate\View\Concerns;
 
-use Closure;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Arr;
-use Illuminate\Support\HtmlString;
 use Illuminate\View\ComponentSlot;
 
 trait ManagesComponents
@@ -49,14 +47,17 @@ trait ManagesComponents
     /**
      * Start a component rendering process.
      *
-     * @param  \Illuminate\Contracts\View\View|\Illuminate\Contracts\Support\Htmlable|Closure|string  $view
+     * @param  \Illuminate\Contracts\View\View|\Illuminate\Contracts\Support\Htmlable|\Closure|string  $view
+     * @param  array  $data
      * @return void
      */
     public function startComponent($view, array $data = [])
     {
         if (ob_start()) {
             $this->componentStack[] = $view;
+
             $this->componentData[$this->currentComponent()] = $data;
+
             $this->slots[$this->currentComponent()] = [];
         }
     }
@@ -64,6 +65,8 @@ trait ManagesComponents
     /**
      * Get the first view that actually exists from the given list, and start a component.
      *
+     * @param  array  $names
+     * @param  array  $data
      * @return void
      */
     public function startComponentFirst(array $names, array $data = [])
@@ -71,6 +74,7 @@ trait ManagesComponents
         $name = Arr::first($names, function ($item) {
             return $this->exists($item);
         });
+
         $this->startComponent($name, $data);
     }
 
@@ -82,10 +86,14 @@ trait ManagesComponents
     public function renderComponent()
     {
         $view = array_pop($this->componentStack);
-        $this->currentComponentData = array_merge($previousComponentData = $this->currentComponentData, $data = $this->componentData());
+
+        $this->currentComponentData = array_merge(
+            $previousComponentData = $this->currentComponentData,
+            $data = $this->componentData()
+        );
 
         try {
-            $view = \__Illuminate\value($view, $data);
+            $view = value($view, $data);
 
             if ($view instanceof View) {
                 return $view->with($data)->render();
@@ -106,10 +114,18 @@ trait ManagesComponents
      */
     protected function componentData()
     {
-        $defaultSlot = new HtmlString(trim(ob_get_clean()));
-        $slots = array_merge(['__default' => $defaultSlot], $this->slots[count($this->componentStack)]);
+        $defaultSlot = new ComponentSlot(trim(ob_get_clean()));
 
-        return array_merge($this->componentData[count($this->componentStack)], ['slot' => $defaultSlot], $this->slots[count($this->componentStack)], ['__laravel_slots' => $slots]);
+        $slots = array_merge([
+            '__default' => $defaultSlot,
+        ], $this->slots[count($this->componentStack)]);
+
+        return array_merge(
+            $this->componentData[count($this->componentStack)],
+            ['slot' => $defaultSlot],
+            $this->slots[count($this->componentStack)],
+            ['__laravel_slots' => $slots]
+        );
     }
 
     /**
@@ -124,10 +140,11 @@ trait ManagesComponents
         if (array_key_exists($key, $this->currentComponentData)) {
             return $this->currentComponentData[$key];
         }
+
         $currentComponent = count($this->componentStack);
 
         if ($currentComponent === 0) {
-            return \__Illuminate\value($default);
+            return value($default);
         }
 
         for ($i = $currentComponent - 1; $i >= 0; $i--) {
@@ -138,7 +155,7 @@ trait ManagesComponents
             }
         }
 
-        return \__Illuminate\value($default);
+        return value($default);
     }
 
     /**
@@ -155,6 +172,7 @@ trait ManagesComponents
             $this->slots[$this->currentComponent()][$name] = $content;
         } elseif (ob_start()) {
             $this->slots[$this->currentComponent()][$name] = '';
+
             $this->slotStack[$this->currentComponent()][] = [$name, $attributes];
         }
     }
@@ -166,10 +184,17 @@ trait ManagesComponents
      */
     public function endSlot()
     {
-        \__Illuminate\last($this->componentStack);
-        $currentSlot = array_pop($this->slotStack[$this->currentComponent()]);
+        last($this->componentStack);
+
+        $currentSlot = array_pop(
+            $this->slotStack[$this->currentComponent()]
+        );
+
         [$currentName, $currentAttributes] = $currentSlot;
-        $this->slots[$this->currentComponent()][$currentName] = new ComponentSlot(trim(ob_get_clean()), $currentAttributes);
+
+        $this->slots[$this->currentComponent()][$currentName] = new ComponentSlot(
+            trim(ob_get_clean()), $currentAttributes
+        );
     }
 
     /**

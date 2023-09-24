@@ -1,12 +1,9 @@
 <?php
 
-namespace __Illuminate;
-
-use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
-if (! function_exists('__Illuminate\\\__Illuminate\collect')) {
+if (! function_exists('collect')) {
     /**
      * Create a collection from the given value.
      *
@@ -22,7 +19,7 @@ if (! function_exists('__Illuminate\\\__Illuminate\collect')) {
     }
 }
 
-if (! function_exists('__Illuminate\\\__Illuminate\data_fill')) {
+if (! function_exists('data_fill')) {
     /**
      * Fill in data where it's missing.
      *
@@ -33,11 +30,11 @@ if (! function_exists('__Illuminate\\\__Illuminate\data_fill')) {
      */
     function data_fill(&$target, $key, $value)
     {
-        return \__Illuminate\data_set($target, $key, $value, false);
+        return data_set($target, $key, $value, false);
     }
 }
 
-if (! function_exists('__Illuminate\\\__Illuminate\data_get')) {
+if (! function_exists('data_get')) {
     /**
      * Get an item from an array or object using "dot" notation.
      *
@@ -51,6 +48,7 @@ if (! function_exists('__Illuminate\\\__Illuminate\data_get')) {
         if (is_null($key)) {
             return $target;
         }
+
         $key = is_array($key) ? $key : explode('.', $key);
 
         foreach ($key as $i => $segment) {
@@ -64,12 +62,13 @@ if (! function_exists('__Illuminate\\\__Illuminate\data_get')) {
                 if ($target instanceof Collection) {
                     $target = $target->all();
                 } elseif (! is_iterable($target)) {
-                    return \__Illuminate\value($default);
+                    return value($default);
                 }
+
                 $result = [];
 
                 foreach ($target as $item) {
-                    $result[] = \__Illuminate\data_get($item, $key);
+                    $result[] = data_get($item, $key);
                 }
 
                 return in_array('*', $key) ? Arr::collapse($result) : $result;
@@ -80,7 +79,7 @@ if (! function_exists('__Illuminate\\\__Illuminate\data_get')) {
             } elseif (is_object($target) && isset($target->{$segment})) {
                 $target = $target->{$segment};
             } else {
-                return \__Illuminate\value($default);
+                return value($default);
             }
         }
 
@@ -88,7 +87,7 @@ if (! function_exists('__Illuminate\\\__Illuminate\data_get')) {
     }
 }
 
-if (! function_exists('__Illuminate\\\__Illuminate\data_set')) {
+if (! function_exists('data_set')) {
     /**
      * Set an item on an array or object using dot notation.
      *
@@ -109,7 +108,7 @@ if (! function_exists('__Illuminate\\\__Illuminate\data_set')) {
 
             if ($segments) {
                 foreach ($target as &$inner) {
-                    \__Illuminate\data_set($inner, $segments, $value, $overwrite);
+                    data_set($inner, $segments, $value, $overwrite);
                 }
             } elseif ($overwrite) {
                 foreach ($target as &$inner) {
@@ -121,7 +120,8 @@ if (! function_exists('__Illuminate\\\__Illuminate\data_set')) {
                 if (! Arr::exists($target, $segment)) {
                     $target[$segment] = [];
                 }
-                \__Illuminate\data_set($target[$segment], $segments, $value, $overwrite);
+
+                data_set($target[$segment], $segments, $value, $overwrite);
             } elseif ($overwrite || ! Arr::exists($target, $segment)) {
                 $target[$segment] = $value;
             }
@@ -130,7 +130,8 @@ if (! function_exists('__Illuminate\\\__Illuminate\data_set')) {
                 if (! isset($target->{$segment})) {
                     $target->{$segment} = [];
                 }
-                \__Illuminate\data_set($target->{$segment}, $segments, $value, $overwrite);
+
+                data_set($target->{$segment}, $segments, $value, $overwrite);
             } elseif ($overwrite || ! isset($target->{$segment})) {
                 $target->{$segment} = $value;
             }
@@ -138,7 +139,7 @@ if (! function_exists('__Illuminate\\\__Illuminate\data_set')) {
             $target = [];
 
             if ($segments) {
-                \__Illuminate\data_set($target[$segment], $segments, $value, $overwrite);
+                data_set($target[$segment], $segments, $value, $overwrite);
             } elseif ($overwrite) {
                 $target[$segment] = $value;
             }
@@ -148,7 +149,43 @@ if (! function_exists('__Illuminate\\\__Illuminate\data_set')) {
     }
 }
 
-if (! function_exists('__Illuminate\\\__Illuminate\head')) {
+if (! function_exists('data_forget')) {
+    /**
+     * Remove / unset an item from an array or object using "dot" notation.
+     *
+     * @param  mixed  $target
+     * @param  string|array|int|null  $key
+     * @return mixed
+     */
+    function data_forget(&$target, $key)
+    {
+        $segments = is_array($key) ? $key : explode('.', $key);
+
+        if (($segment = array_shift($segments)) === '*' && Arr::accessible($target)) {
+            if ($segments) {
+                foreach ($target as &$inner) {
+                    data_forget($inner, $segments);
+                }
+            }
+        } elseif (Arr::accessible($target)) {
+            if ($segments && Arr::exists($target, $segment)) {
+                data_forget($target[$segment], $segments);
+            } else {
+                Arr::forget($target, $segment);
+            }
+        } elseif (is_object($target)) {
+            if ($segments && isset($target->{$segment})) {
+                data_forget($target->{$segment}, $segments);
+            } elseif (isset($target->{$segment})) {
+                unset($target->{$segment});
+            }
+        }
+
+        return $target;
+    }
+}
+
+if (! function_exists('head')) {
     /**
      * Get the first element of an array. Useful for method chaining.
      *
@@ -161,7 +198,7 @@ if (! function_exists('__Illuminate\\\__Illuminate\head')) {
     }
 }
 
-if (! function_exists('__Illuminate\\\__Illuminate\last')) {
+if (! function_exists('last')) {
     /**
      * Get the last element from an array.
      *
@@ -174,7 +211,7 @@ if (! function_exists('__Illuminate\\\__Illuminate\last')) {
     }
 }
 
-if (! function_exists('__Illuminate\\\__Illuminate\value')) {
+if (! function_exists('value')) {
     /**
      * Return the default value of the given value.
      *

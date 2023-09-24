@@ -38,14 +38,16 @@ trait ManagesFragments
      *
      * @return string
      *
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     public function stopFragment()
     {
         if (empty($this->fragmentStack)) {
             throw new InvalidArgumentException('Cannot end a fragment without first starting one.');
         }
+
         $last = array_pop($this->fragmentStack);
+
         $this->fragments[$last] = ob_get_clean();
 
         return $this->fragments[$last];
